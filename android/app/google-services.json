@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "267959423896",
+    "project_id": "med-assist-edd50",
+    "storage_bucket": "med-assist-edd50.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267959423896:android:bb680f70203c1d213451ed",
+        "android_client_info": {
+          "package_name": "com.example.med_assist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB23QXWSv95q6kkj3-euMCyPqdA3BuIncw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
