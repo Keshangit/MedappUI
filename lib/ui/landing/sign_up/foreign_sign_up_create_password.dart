@@ -77,7 +77,7 @@ class _CreatePasswordForeignState extends State<CreatePasswordForeign> {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 8),
               Text(
                 'Please create new password for your account.',
                 style: GoogleFonts.inter(
@@ -86,7 +86,7 @@ class _CreatePasswordForeignState extends State<CreatePasswordForeign> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 8),
               Form(
                 key: _formKey,
                 child: Column(
@@ -103,12 +103,12 @@ class _CreatePasswordForeignState extends State<CreatePasswordForeign> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     CustomPasswordField(
                       controller: passwordController,
                       hintText: '**********',
                     ),
-                    const SizedBox(height: 10),
+                    //const SizedBox(height: 10),
                     Text(
                       'The password must be 8 characters, including 1 uppercase letter, 1 number, and 1 special character, no spaces allowed',
                       textAlign: TextAlign.justify,

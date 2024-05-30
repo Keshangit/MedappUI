@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:med_assist/constants.dart';
+import 'package:med_assist/providers/user_profile_create_provider.dart';
 import 'package:med_assist/shared_widgets/custom_input_feild.dart';
 import 'package:med_assist/shared_widgets/custome_email_feild.dart';
 import 'package:med_assist/shared_widgets/custome_submit_button.dart';
 import 'package:med_assist/ui/mp/home_page/user_form_two.dart';
+import 'package:provider/provider.dart';
 
 class UserForm extends StatefulWidget {
   const UserForm({super.key});
@@ -40,6 +42,21 @@ class _UserFormState extends State<UserForm> {
     }
   }
 
+  Future<void> _selectsignInDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      firstDate: DateTime(1800),
+      lastDate: DateTime(3100),
+      initialDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        lastSignOffDateController.text =
+            DateFormat('dd/MM/yyyy').format(picked);
+      });
+    }
+  }
+
   String _selectedGender = 'Male'; // Default selected value
 
   void _handleGenderChange(String? value) {
@@ -54,6 +71,30 @@ class _UserFormState extends State<UserForm> {
     setState(() {
       _selectMember = value!;
     });
+  }
+
+  void saveData() {
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
+
+    userProfileProvider.updateFirstName(firstNameController.text);
+    userProfileProvider.updateMiddleName(middleNameController.text);
+    userProfileProvider.updateLastName(lastNameController.text);
+    userProfileProvider.updateEmail(emailController.text);
+    userProfileProvider.updateMobile(mobileController.text);
+    userProfileProvider.updateAddress(addressController.text);
+    userProfileProvider.updateDob(dobController.text);
+    userProfileProvider.updateGender(_selectedGender);
+    userProfileProvider.updateMbasid(mbasidController.text);
+    userProfileProvider.updateMemberType(_selectMember);
+    userProfileProvider.updateLastSignOffDate(lastSignOffDateController.text);
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserFormTwo(),
+      ),
+    );
   }
 
   @override
@@ -264,7 +305,7 @@ class _UserFormState extends State<UserForm> {
                       controller: lastSignOffDateController,
                       hintText: 'DD/MM//YYYY',
                       suffixIcon: Icons.date_range,
-                      onTap: _selectDate,
+                      onTap: _selectsignInDate,
                     ),
                   ],
                 ),
@@ -274,12 +315,7 @@ class _UserFormState extends State<UserForm> {
                 title: 'Next',
                 color: kBlue,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => UserFormTwo(),
-                    ),
-                  );
+                  saveData();
                 },
               ),
             ],

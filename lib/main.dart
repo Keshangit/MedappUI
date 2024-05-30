@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:med_assist/constants.dart';
+import 'package:med_assist/providers/user_profile_create_provider.dart';
 import 'package:med_assist/services/auth_service.dart';
 import 'package:med_assist/services/firebaseauth.dart';
 import 'package:med_assist/ui/landing/splash/splash_screen.dart';
@@ -20,6 +21,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthenticationService()),
+        ChangeNotifierProvider(create: (context) => UserProfileProvider()),
       ],
       child: const MedAssistApp(),
     ),

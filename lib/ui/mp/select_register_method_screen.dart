@@ -27,7 +27,7 @@ class SelectRegistrationMethodScreen extends StatelessWidget {
                       'Let’s get you registered',
                       style: GoogleFonts.inter(
                         color: kBlack,
-                        fontSize: 30,
+                        fontSize: 28,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -41,7 +41,7 @@ class SelectRegistrationMethodScreen extends StatelessWidget {
                         'Please choose your way of registration to the system.',
                         style: GoogleFonts.inter(
                           color: kLightGrey,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w400,
                         ),
                       ),

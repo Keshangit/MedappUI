@@ -218,7 +218,6 @@ class _SubmitOTPScreen extends State<SubmitOTPScreen> {
                           builder: (context) => ResetPasswordScreen(
                             email: widget.email,
                             otp: otpCode,
-
                           ),
                         ),
                       );

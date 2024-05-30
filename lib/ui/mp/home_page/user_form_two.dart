@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:med_assist/constants.dart';
+import 'package:med_assist/providers/user_profile_create_provider.dart';
 import 'package:med_assist/shared_widgets/appbar.dart';
 import 'package:med_assist/shared_widgets/custome_submit_button.dart';
 import 'package:med_assist/ui/mp/home_page/user_form_three.dart';
+import 'package:provider/provider.dart';
 
 import '../../../shared_widgets/text_area.dart';
 
@@ -29,6 +31,23 @@ class _UserFormTwoState extends State<UserFormTwo> {
     'Outpatient Service',
     'Inpatient Service',
   ];
+
+  void saveData() {
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
+
+    userProfileProvider.updateMedicalProblem(medicalProblemController.text);
+    userProfileProvider.updateSymptoms(symptomsController.text);
+    userProfileProvider
+        .updateRequiredService(_selectedValue != null ? _selectedValue! : '');
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserFormThree(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -156,12 +175,13 @@ class _UserFormTwoState extends State<UserFormTwo> {
                 title: 'Next',
                 color: kBlue,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const UserFormThree(),
-                    ),
-                  );
+                  saveData();
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => const UserFormThree(),
+                  //   ),
+                  // );
                 },
               ),
             ],

@@ -4,12 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:med_assist/constants.dart';
+import 'package:med_assist/dialogs/custome_loading_dialog.dart';
+import 'package:med_assist/providers/user_profile_create_provider.dart';
+import 'package:med_assist/services/auth_service.dart';
+import 'package:med_assist/services/user_form_service.dart';
 import 'package:med_assist/shared_widgets/appbar.dart';
 import 'package:med_assist/shared_widgets/custom_input_feild.dart';
 import 'package:med_assist/shared_widgets/custome_icon_submit_button.dart';
 import 'package:med_assist/shared_widgets/custome_submit_button.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:med_assist/shared_widgets/snak_bars.dart';
 import 'package:path/path.dart';
+import 'package:provider/provider.dart';
 
 class UserFormThree extends StatefulWidget {
   const UserFormThree({super.key});
@@ -28,17 +34,108 @@ class _UserFormThreeState extends State<UserFormThree> {
 
   List<File> files = [];
 
+  void saveData(BuildContext context) {
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
+
+    userProfileProvider.updateNameHospital(nameHospitalController.text);
+    userProfileProvider.updateAddressHospital(addressHospitalController.text);
+    userProfileProvider.updateNameDoctor(nameDoctorController.text);
+    userProfileProvider.updateDateOfVisit(dateOfVisitController.text);
+    userProfileProvider.updateLikeAppointment(_selectedValue);
+
+    submitProviderData(context);
+
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(
+    //     builder: (context) => UserFormThree(),
+    //   ),
+    // );
+  }
+
+  void submitProviderData(BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const CustomLoadingDialog(
+        title: 'Please Wait',
+      ),
+    );
+
+    try {
+      if (mounted) {
+        UserProfileProvider userProfileProvider =
+            Provider.of<UserProfileProvider>(context, listen: false);
+        var response = await UserFormService.userFormSubmit(
+          userProfileProvider.firstName!,
+          userProfileProvider.middleName!,
+          userProfileProvider.lastName!,
+          userProfileProvider.email!,
+          userProfileProvider.mobile!,
+          userProfileProvider.address!,
+          userProfileProvider.dob!,
+          userProfileProvider.gender!,
+          userProfileProvider.mbasid!,
+          userProfileProvider.memberType!,
+          userProfileProvider.lastSignOffDate!,
+          userProfileProvider.medicalProblem!,
+          userProfileProvider.symptoms!,
+          userProfileProvider.requiredService!,
+          userProfileProvider.nameHospital!,
+          userProfileProvider.addressHospital!,
+          userProfileProvider.nameDoctor!,
+          userProfileProvider.dateOfVisit!,
+          userProfileProvider.likeAppointment!,
+          userProfileProvider.uploadedFiles!,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          successSnackBar(response),
+        );
+        userProfileProvider.clearData();
+
+        print(response);
+      }
+      Navigator.pop(context);
+      AuthenticationService().applicationInit(context);
+
+      // Navigator.pushAndRemoveUntil(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => const UserForm(),
+      //   ),
+      //   (route) => false,
+      // );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          errorSnackBar('Unable to Save Data: $e'),
+        );
+      }
+      Navigator.pop(context);
+    }
+  }
+
   String? _selectedValue;
   final List<String> _dropdownItems = [
     'Yes',
     'No',
   ];
 
-  Future<void> _pickFiles() async {
+  Future<void> _pickFiles(BuildContext context) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       type: FileType.custom,
-      allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf', 'doc', 'docs', 'docx', 'xlsx'],
+      allowedExtensions: [
+        'jpg',
+        'jpeg',
+        'png',
+        'pdf',
+        'doc',
+        'docs',
+        'docx',
+        'xlsx'
+      ],
     );
     if (result != null) {
       if (selectedFiles.isEmpty) {
@@ -47,11 +144,38 @@ class _UserFormThreeState extends State<UserFormThree> {
         });
       } else {
         setState(() {
-          final newPaths =
-              result.paths.take(3 - selectedFiles.length).map((path) => path!).toList();
+          final newPaths = result.paths
+              .take(3 - selectedFiles.length)
+              .map((path) => path!)
+              .toList();
           selectedFiles.addAll(newPaths);
         });
       }
+
+      if (result != null) {
+        List<File> files = result.paths.map((path) => File(path!)).toList();
+        files = files.take(3).toList(); // Limit to 3 files
+
+        Provider.of<UserProfileProvider>(context, listen: false)
+            .updateUploadedFiles(files);
+
+        setState(() {
+          selectedFiles = files.map((file) => file.path).toList();
+        });
+      }
+
+      // if (result != null) {
+      //   // Filter out null values and convert to List<String>
+      //   List<String> filePaths = result.paths
+      //       .where((path) => path != null)
+      //       .cast<String>()
+      //       .take(3)
+      //       .toList();
+      //   Provider.of<UserProfileProvider>(context, listen: false)
+      //       .updateUploadedFiles(filePaths);
+      // }
+      // Provider.of<UserProfileProvider>(context, listen: false)
+      //     .updateUploadedFiles(selectedFiles);
     }
   }
 
@@ -194,7 +318,8 @@ class _UserFormThreeState extends State<UserFormThree> {
                         });
                       },
                       decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 20),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
@@ -229,7 +354,7 @@ class _UserFormThreeState extends State<UserFormThree> {
                       color: kBlack,
                       icon: Icons.file_upload_outlined,
                       onTap: () {
-                        _pickFiles();
+                        _pickFiles(context);
                       },
                     ),
                     selectedFiles.isNotEmpty
@@ -248,13 +373,15 @@ class _UserFormThreeState extends State<UserFormThree> {
                                             horizontal: 10,
                                             vertical: 5,
                                           ),
-                                          margin: const EdgeInsets.only(right: 5, bottom: 5),
+                                          margin: const EdgeInsets.only(
+                                              right: 5, bottom: 5),
                                           decoration: BoxDecoration(
                                             border: Border.all(
                                               color: kGrey,
                                               width: 1,
                                             ),
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
@@ -265,7 +392,8 @@ class _UserFormThreeState extends State<UserFormThree> {
                                                     selectedFile,
                                                   ),
                                                   textAlign: TextAlign.center,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   style: GoogleFonts.roboto(
                                                     color: kBlack,
                                                     fontSize: 14,
@@ -277,7 +405,8 @@ class _UserFormThreeState extends State<UserFormThree> {
                                               GestureDetector(
                                                 onTap: () {
                                                   setState(() {
-                                                    selectedFiles.remove(selectedFile);
+                                                    selectedFiles
+                                                        .remove(selectedFile);
                                                   });
                                                 },
                                                 child: Icon(
@@ -302,7 +431,9 @@ class _UserFormThreeState extends State<UserFormThree> {
               CustomSubmitButton(
                 title: 'Submit',
                 color: kBlue,
-                onTap: () {},
+                onTap: () {
+                  saveData(context);
+                },
               ),
             ],
           ),
